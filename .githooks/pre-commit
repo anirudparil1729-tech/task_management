@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Running pre-commit checks..."
+
+# Check if pre-commit is installed
+if ! command -v pre-commit &> /dev/null; then
+    echo "⚠️  pre-commit not found. Skipping pre-commit hooks."
+    echo "To enable pre-commit hooks, run: pip install pre-commit && pre-commit install"
+    exit 0
+fi
+
+# Run pre-commit hooks
+pre-commit run --all-files
+
+exit $?

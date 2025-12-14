@@ -1,0 +1,38 @@
+#!/bin/sh
+
+echo "Running pre-push checks..."
+
+# Check if pnpm is available
+if ! command -v pnpm &> /dev/null; then
+    echo "⚠️  pnpm not found. Skipping frontend tests."
+    FRONTEND_EXIT=0
+else
+    # Run frontend tests
+    echo "Running frontend tests..."
+    cd frontend
+    pnpm test
+    FRONTEND_EXIT=$?
+    cd ..
+fi
+
+# Check if pytest is available
+if ! command -v pytest &> /dev/null; then
+    echo "⚠️  pytest not found. Skipping backend tests."
+    BACKEND_EXIT=0
+else
+    # Run backend tests
+    echo "Running backend tests..."
+    cd backend
+    pytest
+    BACKEND_EXIT=$?
+    cd ..
+fi
+
+# Exit with error if any tests failed
+if [ $FRONTEND_EXIT -ne 0 ] || [ $BACKEND_EXIT -ne 0 ]; then
+    echo "Tests failed. Push aborted."
+    exit 1
+fi
+
+echo "All tests passed!"
+exit 0
