@@ -4,3 +4,8 @@ export * from './Badge';
 export * from './Icon';
 export * from './Input';
 export * from './Layout';
+export * from './Select';
+export * from './Checkbox';
+export * from './Textarea';
+export * from './Drawer';
+export * from './Progress';
