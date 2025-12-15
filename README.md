@@ -8,6 +8,7 @@ A modern full-stack monorepo with Next.js frontend and FastAPI backend.
 .
 ├── frontend/          # Next.js + TypeScript frontend
 ├── backend/           # FastAPI + Python backend
+├── mobile/android/    # Android app (Compose + Hilt + DataStore)
 ├── .devcontainer/     # VSCode dev container configuration
 ├── .github/           # GitHub workflows
 ├── docker-compose.yml # Multi-container orchestration
@@ -178,6 +179,7 @@ This project includes a DevContainer configuration for a consistent development 
 
 - [Frontend Documentation](./frontend/README.md)
 - [Backend Documentation](./backend/README.md)
+- [Android (mobile) Documentation](./mobile/android/README.md)
 
 ## 🤝 Contributing
 

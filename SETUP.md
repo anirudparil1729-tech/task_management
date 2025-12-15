@@ -35,8 +35,12 @@ This guide provides detailed instructions for setting up the development environ
    - Recommended extensions are listed in `.vscode/extensions.json`
 
 3. **Git**
-   - Download from [git-scm.com](https://git-scm.com/)
-   - Required for version control
+    - Download from [git-scm.com](https://git-scm.com/)
+    - Required for version control
+
+4. **Android Studio + Android SDK** (only if you want to build the Android app)
+    - Install Android Studio (includes the SDK manager)
+    - Ensure you have JDK 17 available
 
 ## Installation Steps
 
@@ -119,6 +123,24 @@ Terminal 2 (Backend):
 cd backend
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+### Android (mobile)
+
+Build the Android debug APK:
+
+```bash
+cd mobile/android
+./gradlew :app:assembleDebug
+```
+
+Create a release bundle (AAB):
+
+```bash
+cd mobile/android
+./gradlew :app:bundleRelease
+```
+
+See `mobile/android/README.md` for design-token sync instructions.
 
 ### Docker Development
 

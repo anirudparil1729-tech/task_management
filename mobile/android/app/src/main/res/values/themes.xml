@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Theme.TaskManagement" parent="Theme.Material3.DayNight.NoActionBar">
+    <item name="colorPrimary">@color/tm_primary</item>
+    <item name="colorOnPrimary">@color/tm_onPrimary</item>
+    <item name="colorSecondary">@color/tm_secondary</item>
+    <item name="colorOnSecondary">@color/tm_onSecondary</item>
+    <item name="android:statusBarColor">@color/tm_background</item>
+    <item name="android:navigationBarColor">@color/tm_background</item>
+  </style>
+</resources>
