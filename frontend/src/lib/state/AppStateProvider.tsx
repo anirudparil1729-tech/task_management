@@ -129,10 +129,15 @@ interface AppStateContextValue {
   hydrated: boolean;
   state: AppState;
   createCategory: (input: Pick<CategoryEntity, 'name' | 'color' | 'icon'>) => void;
+  updateCategory: (localId: string, updates: Partial<Pick<CategoryEntity, 'name' | 'color' | 'icon'>>) => void;
   deleteCategory: (localId: string) => void;
   createTask: (input: Pick<TaskEntity, 'title'> & { categoryLocalId?: string | null }) => void;
+  updateTask: (localId: string, updates: Partial<Omit<TaskEntity, 'localId' | 'serverId' | 'createdAt'>>) => void;
   toggleTaskCompleted: (localId: string) => void;
   deleteTask: (localId: string) => void;
+  createTimeBlock: (input: Pick<TimeBlockEntity, 'startTime' | 'endTime' | 'title' | 'taskLocalId' | 'description'>) => void;
+  updateTimeBlock: (localId: string, updates: Partial<Omit<TimeBlockEntity, 'localId' | 'serverId' | 'createdAt'>>) => void;
+  deleteTimeBlock: (localId: string) => void;
   addReminder: (input: Pick<ReminderEntity, 'title' | 'body' | 'fireAt'>) => void;
   markReminderNotified: (reminderId: string, notifiedAt: ISODateString) => void;
   startFocusTimer: (durationMinutes: number) => void;
@@ -302,6 +307,45 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const updateCategory = React.useCallback(
+    (localId: string, updates: Partial<Pick<CategoryEntity, 'name' | 'color' | 'icon'>>) => {
+      setState((prev) => {
+        const category = prev.categories[localId];
+        if (!category) {
+          return prev;
+        }
+
+        const timestamp = nowIso();
+        const updated: CategoryEntity = {
+          ...category,
+          ...updates,
+          updatedAt: timestamp,
+        };
+
+        const payload = {
+          ...(updates.name !== undefined && { name: updates.name }),
+          ...(updates.color !== undefined && { color: updates.color }),
+          ...(updates.icon !== undefined && { icon: updates.icon }),
+        };
+
+        const outboxItem: OutboxItem = {
+          id: crypto.randomUUID(),
+          entity: 'category',
+          op: category.serverId ? 'update' : 'update',
+          localId,
+          serverId: category.serverId,
+          timestamp,
+          payload,
+        };
+
+        const { outbox } = ensureOutboxItem(prev.outbox, outboxItem);
+
+        return { ...prev, categories: { ...prev.categories, [localId]: updated }, outbox };
+      });
+    },
+    []
+  );
+
   const deleteCategory = React.useCallback((localId: string) => {
     setState((prev) => {
       const category = prev.categories[localId];
@@ -387,6 +431,55 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const updateTask = React.useCallback(
+    (localId: string, updates: Partial<Omit<TaskEntity, 'localId' | 'serverId' | 'createdAt'>>) => {
+      setState((prev) => {
+        const task = prev.tasks[localId];
+        if (!task) {
+          return prev;
+        }
+
+        const timestamp = nowIso();
+        const updated: TaskEntity = {
+          ...task,
+          ...updates,
+          updatedAt: timestamp,
+        };
+
+        const payload = {
+          ...(updates.title !== undefined && { title: updates.title }),
+          ...(updates.description !== undefined && { description: updates.description }),
+          ...(updates.notes !== undefined && { notes: updates.notes }),
+          ...(updates.dueDate !== undefined && { due_date: updates.dueDate }),
+          ...(updates.reminderTime !== undefined && { reminder_time: updates.reminderTime }),
+          ...(updates.priority !== undefined && { priority: updates.priority }),
+          ...(updates.recurrenceRule !== undefined && { recurrence_rule: updates.recurrenceRule }),
+          ...(updates.isCompleted !== undefined && { is_completed: updates.isCompleted }),
+          ...(updates.categoryLocalId !== undefined && {
+            category_id: updates.categoryLocalId
+              ? prev.categories[updates.categoryLocalId]?.serverId ?? null
+              : null,
+          }),
+        };
+
+        const outboxItem: OutboxItem = {
+          id: crypto.randomUUID(),
+          entity: 'task',
+          op: task.serverId ? 'update' : 'update',
+          localId,
+          serverId: task.serverId,
+          timestamp,
+          payload,
+        };
+
+        const { outbox } = ensureOutboxItem(prev.outbox, outboxItem);
+
+        return { ...prev, tasks: { ...prev.tasks, [localId]: updated }, outbox };
+      });
+    },
+    []
+  );
+
   const toggleTaskCompleted = React.useCallback((localId: string) => {
     setState((prev) => {
       const task = prev.tasks[localId];
@@ -458,6 +551,128 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       };
 
       return { ...prev, tasks: nextTasks, outbox: [...prev.outbox, outboxItem] };
+    });
+  }, []);
+
+  const createTimeBlock = React.useCallback(
+    (input: Pick<TimeBlockEntity, 'startTime' | 'endTime' | 'title' | 'taskLocalId' | 'description'>) => {
+      const localId = createLocalId('timeBlock');
+      const timestamp = nowIso();
+
+      const timeBlock: TimeBlockEntity = {
+        localId,
+        taskLocalId: input.taskLocalId ?? null,
+        startTime: input.startTime,
+        endTime: input.endTime,
+        title: input.title ?? null,
+        description: input.description ?? null,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+
+      const outboxItem: OutboxItem = {
+        id: crypto.randomUUID(),
+        entity: 'timeBlock',
+        op: 'create',
+        localId,
+        timestamp,
+        payload: {
+          task_id: null,
+          start_time: timeBlock.startTime,
+          end_time: timeBlock.endTime,
+          title: timeBlock.title,
+          description: timeBlock.description,
+        },
+      };
+
+      setState((prev) => ({
+        ...prev,
+        timeBlocks: { ...prev.timeBlocks, [localId]: timeBlock },
+        outbox: [...prev.outbox, outboxItem],
+      }));
+    },
+    []
+  );
+
+  const updateTimeBlock = React.useCallback(
+    (localId: string, updates: Partial<Omit<TimeBlockEntity, 'localId' | 'serverId' | 'createdAt'>>) => {
+      setState((prev) => {
+        const timeBlock = prev.timeBlocks[localId];
+        if (!timeBlock) {
+          return prev;
+        }
+
+        const timestamp = nowIso();
+        const updated: TimeBlockEntity = {
+          ...timeBlock,
+          ...updates,
+          updatedAt: timestamp,
+        };
+
+        const payload = {
+          ...(updates.taskLocalId !== undefined && {
+            task_id: updates.taskLocalId
+              ? prev.tasks[updates.taskLocalId]?.serverId ?? null
+              : null,
+          }),
+          ...(updates.startTime !== undefined && { start_time: updates.startTime }),
+          ...(updates.endTime !== undefined && { end_time: updates.endTime }),
+          ...(updates.title !== undefined && { title: updates.title }),
+          ...(updates.description !== undefined && { description: updates.description }),
+        };
+
+        const outboxItem: OutboxItem = {
+          id: crypto.randomUUID(),
+          entity: 'timeBlock',
+          op: timeBlock.serverId ? 'update' : 'update',
+          localId,
+          serverId: timeBlock.serverId,
+          timestamp,
+          payload,
+        };
+
+        const { outbox } = ensureOutboxItem(prev.outbox, outboxItem);
+
+        return { ...prev, timeBlocks: { ...prev.timeBlocks, [localId]: updated }, outbox };
+      });
+    },
+    []
+  );
+
+  const deleteTimeBlock = React.useCallback((localId: string) => {
+    setState((prev) => {
+      const timeBlock = prev.timeBlocks[localId];
+      if (!timeBlock) {
+        return prev;
+      }
+
+      const nextTimeBlocks = { ...prev.timeBlocks };
+      delete nextTimeBlocks[localId];
+
+      const existingCreateIdx = prev.outbox.findIndex(
+        (o) => o.entity === 'timeBlock' && o.op === 'create' && o.localId === localId
+      );
+
+      if (!timeBlock.serverId && existingCreateIdx !== -1) {
+        const nextOutbox = [...prev.outbox];
+        nextOutbox.splice(existingCreateIdx, 1);
+        return { ...prev, timeBlocks: nextTimeBlocks, outbox: nextOutbox };
+      }
+
+      if (!timeBlock.serverId) {
+        return { ...prev, timeBlocks: nextTimeBlocks };
+      }
+
+      const outboxItem: OutboxItem = {
+        id: crypto.randomUUID(),
+        entity: 'timeBlock',
+        op: 'delete',
+        localId,
+        serverId: timeBlock.serverId,
+        timestamp: nowIso(),
+      };
+
+      return { ...prev, timeBlocks: nextTimeBlocks, outbox: [...prev.outbox, outboxItem] };
     });
   }, []);
 
@@ -784,10 +999,15 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       hydrated,
       state,
       createCategory,
+      updateCategory,
       deleteCategory,
       createTask,
+      updateTask,
       toggleTaskCompleted,
       deleteTask,
+      createTimeBlock,
+      updateTimeBlock,
+      deleteTimeBlock,
       addReminder,
       markReminderNotified,
       startFocusTimer,
@@ -806,10 +1026,15 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       hydrated,
       state,
       createCategory,
+      updateCategory,
       deleteCategory,
       createTask,
+      updateTask,
       toggleTaskCompleted,
       deleteTask,
+      createTimeBlock,
+      updateTimeBlock,
+      deleteTimeBlock,
       addReminder,
       markReminderNotified,
       startFocusTimer,
