@@ -27,6 +27,8 @@ interface TasksRepository {
     update: TaskUpdateDto,
   )
 
+  suspend fun markTaskCompleted(localId: String, completed: Boolean)
+
   suspend fun deleteTask(localId: String)
 }
 
@@ -143,6 +145,13 @@ class DefaultTasksRepository @Inject constructor(
     }
 
     syncEngine.requestSyncNow()
+  }
+
+  override suspend fun markTaskCompleted(localId: String, completed: Boolean) {
+    updateTask(
+      localId = localId,
+      update = TaskUpdateDto(isCompleted = completed),
+    )
   }
 
   override suspend fun deleteTask(localId: String) {

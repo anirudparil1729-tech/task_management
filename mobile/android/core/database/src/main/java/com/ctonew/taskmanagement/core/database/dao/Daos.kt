@@ -24,6 +24,29 @@ interface TaskDao {
   @Query("SELECT * FROM tasks WHERE remoteId = :remoteId LIMIT 1")
   suspend fun getByRemoteId(remoteId: Int): TaskEntity?
 
+  @Query(
+    """
+    SELECT * FROM tasks
+    WHERE isCompleted = 0
+      AND dueDateMillis IS NOT NULL
+      AND dueDateMillis >= :startMillis
+      AND dueDateMillis <= :endMillis
+    ORDER BY dueDateMillis ASC
+    """,
+  )
+  fun getTasksDueWithinTimeframe(startMillis: Long, endMillis: Long): Flow<List<TaskEntity>>
+
+  @Query(
+    """
+    SELECT * FROM tasks
+    WHERE isCompleted = 0
+      AND dueDateMillis IS NOT NULL
+      AND dueDateMillis < :currentTimeMillis
+    ORDER BY dueDateMillis ASC
+    """,
+  )
+  fun getOverdueTasks(currentTimeMillis: Long): Flow<List<TaskEntity>>
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun upsert(task: TaskEntity)
 
