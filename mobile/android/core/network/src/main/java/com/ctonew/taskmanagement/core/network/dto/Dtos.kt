@@ -108,6 +108,8 @@ data class TimeBlockCreateDto(
   @Json(name = "task_id") val taskId: Int? = null,
   @Json(name = "start_time") val startTime: Instant,
   @Json(name = "end_time") val endTime: Instant,
+  @Json(name = "estimated_duration_millis") val estimatedDurationMillis: Long? = null,
+  @Json(name = "actual_duration_millis") val actualDurationMillis: Long? = null,
   val title: String? = null,
   val description: String? = null,
 )
@@ -117,6 +119,8 @@ data class TimeBlockUpdateDto(
   @Json(name = "task_id") val taskId: Int? = null,
   @Json(name = "start_time") val startTime: Instant? = null,
   @Json(name = "end_time") val endTime: Instant? = null,
+  @Json(name = "estimated_duration_millis") val estimatedDurationMillis: Long? = null,
+  @Json(name = "actual_duration_millis") val actualDurationMillis: Long? = null,
   val title: String? = null,
   val description: String? = null,
 )

@@ -71,6 +71,8 @@ data class TimeBlockEntity(
   val taskRemoteId: Int? = null,
   val startTimeMillis: Long,
   val endTimeMillis: Long,
+  val estimatedDurationMillis: Long? = null,
+  val actualDurationMillis: Long? = null,
   val title: String? = null,
   val description: String? = null,
   val createdAtMillis: Long,

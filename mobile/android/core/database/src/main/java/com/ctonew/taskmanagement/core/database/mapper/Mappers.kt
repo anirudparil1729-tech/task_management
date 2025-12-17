@@ -75,6 +75,8 @@ internal fun TimeBlockDto.toEntity(existingLocalId: String? = null): TimeBlockEn
     taskRemoteId = taskId,
     startTimeMillis = startTime.toEpochMilli(),
     endTimeMillis = endTime.toEpochMilli(),
+    estimatedDurationMillis = null, // Not available in DTO
+    actualDurationMillis = null, // Not available in DTO
     title = title,
     description = description,
     createdAtMillis = createdAt.toEpochMilli(),
@@ -87,6 +89,8 @@ internal fun TimeBlockEntity.toCreateDto(): TimeBlockCreateDto = TimeBlockCreate
   taskId = taskRemoteId,
   startTime = Instant.ofEpochMilli(startTimeMillis),
   endTime = Instant.ofEpochMilli(endTimeMillis),
+  estimatedDurationMillis = estimatedDurationMillis,
+  actualDurationMillis = actualDurationMillis,
   title = title,
   description = description,
 )
