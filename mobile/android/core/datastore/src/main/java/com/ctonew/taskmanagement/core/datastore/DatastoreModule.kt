@@ -10,4 +10,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class DatastoreModule {
   @Binds
   abstract fun bindSyncStateStore(impl: DataStoreSyncStateStore): SyncStateStore
+
+  @Binds
+  abstract fun bindNotificationTokenStore(impl: DataStoreNotificationTokenStore): NotificationTokenStore
 }

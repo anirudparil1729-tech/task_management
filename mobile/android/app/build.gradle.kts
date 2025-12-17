@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.kotlin.kapt)
   alias(libs.plugins.hilt)
   alias(libs.plugins.ktlint)
+  alias(libs.plugins.google.services)
 }
 
 android {
@@ -112,7 +113,27 @@ dependencies {
   kapt(libs.hilt.compiler)
   implementation(libs.androidx.hilt.navigation.compose)
 
+  implementation(libs.androidx.work.runtime.ktx)
+  implementation(libs.androidx.hilt.work)
+  kapt(libs.hilt.compiler)
+
+  implementation(platform(libs.firebase.bom))
+  implementation(libs.firebase.messaging)
+
   debugImplementation(libs.androidx.compose.ui.tooling)
+
+  testImplementation(libs.junit4)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.robolectric)
+  testImplementation(libs.truth)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.androidx.work.testing)
+  testImplementation(libs.androidx.arch.core.testing)
+  testImplementation(libs.mockk)
+
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.truth)
 }
 
 kapt {
