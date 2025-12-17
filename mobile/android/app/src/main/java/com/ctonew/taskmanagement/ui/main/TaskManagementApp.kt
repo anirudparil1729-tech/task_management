@@ -32,7 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ctonew.taskmanagement.R
 import com.ctonew.taskmanagement.ui.features.PlaceholderScreen
 import com.ctonew.taskmanagement.ui.settings.SettingsRoute
-import com.ctonew.taskmanagement.ui.task.TaskDetailSheet
+import com.ctonew.taskmanagement.ui.task.TaskDetailSheetRoute
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,7 +63,7 @@ fun TaskManagementApp() {
       onDismissRequest = closeTaskDetail,
       sheetState = sheetState,
     ) {
-      TaskDetailSheet(onClose = closeTaskDetail)
+      TaskDetailSheetRoute(onClose = closeTaskDetail)
     }
   }
 
@@ -114,11 +114,13 @@ fun TaskManagementApp() {
         .padding(paddingValues),
     ) {
       composable(TopLevelDestination.Dashboard.route) {
-        PlaceholderScreen(titleResId = R.string.dashboard)
+        com.ctonew.taskmanagement.ui.dashboard.DashboardRoute(
+          onOpenTaskDetail = openTaskDetail,
+        )
       }
 
       composable(TopLevelDestination.Categories.route) {
-        PlaceholderScreen(titleResId = R.string.categories)
+        com.ctonew.taskmanagement.ui.categories.CategoriesRoute()
       }
 
       composable(TopLevelDestination.Calendar.route) {
