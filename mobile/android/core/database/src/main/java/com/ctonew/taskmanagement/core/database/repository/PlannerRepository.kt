@@ -21,6 +21,8 @@ interface PlannerRepository {
     startTimeMillis: Long,
     endTimeMillis: Long,
     taskRemoteId: Int? = null,
+    estimatedDurationMillis: Long? = null,
+    actualDurationMillis: Long? = null,
     title: String? = null,
     description: String? = null,
   ): String
@@ -31,6 +33,10 @@ interface PlannerRepository {
   )
 
   suspend fun deleteTimeBlock(localId: String)
+
+  suspend fun getTimeBlocksForDate(startOfDayMillis: Long, endOfDayMillis: Long): List<TimeBlockEntity>
+
+  suspend fun getTimeBlocksForWeek(startOfWeekMillis: Long, endOfWeekMillis: Long): List<TimeBlockEntity>
 }
 
 @Singleton
@@ -46,6 +52,8 @@ class DefaultPlannerRepository @Inject constructor(
     startTimeMillis: Long,
     endTimeMillis: Long,
     taskRemoteId: Int?,
+    estimatedDurationMillis: Long?,
+    actualDurationMillis: Long?,
     title: String?,
     description: String?,
   ): String {
@@ -58,6 +66,8 @@ class DefaultPlannerRepository @Inject constructor(
       taskRemoteId = taskRemoteId,
       startTimeMillis = startTimeMillis,
       endTimeMillis = endTimeMillis,
+      estimatedDurationMillis = estimatedDurationMillis,
+      actualDurationMillis = actualDurationMillis,
       title = title,
       description = description,
       createdAtMillis = now,
@@ -168,6 +178,14 @@ class DefaultPlannerRepository @Inject constructor(
     }
 
     syncEngine.requestSyncNow()
+  }
+
+  override suspend fun getTimeBlocksForDate(startOfDayMillis: Long, endOfDayMillis: Long): List<TimeBlockEntity> {
+    return timeBlockDao.getTimeBlocksForDate(startOfDayMillis, endOfDayMillis)
+  }
+
+  override suspend fun getTimeBlocksForWeek(startOfWeekMillis: Long, endOfWeekMillis: Long): List<TimeBlockEntity> {
+    return timeBlockDao.getTimeBlocksForWeek(startOfWeekMillis, endOfWeekMillis)
   }
 }
 

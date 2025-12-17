@@ -114,6 +114,26 @@ interface TimeBlockDao {
 
   @Query("DELETE FROM time_blocks WHERE localId = :localId")
   suspend fun deleteByLocalId(localId: String)
+
+  @Query(
+    """
+    SELECT * FROM time_blocks
+    WHERE startTimeMillis >= :startOfDayMillis
+      AND startTimeMillis < :endOfDayMillis
+    ORDER BY startTimeMillis ASC
+    """,
+  )
+  suspend fun getTimeBlocksForDate(startOfDayMillis: Long, endOfDayMillis: Long): List<TimeBlockEntity>
+
+  @Query(
+    """
+    SELECT * FROM time_blocks
+    WHERE startTimeMillis >= :startOfWeekMillis
+      AND startTimeMillis < :endOfWeekMillis
+    ORDER BY startTimeMillis ASC
+    """,
+  )
+  suspend fun getTimeBlocksForWeek(startOfWeekMillis: Long, endOfWeekMillis: Long): List<TimeBlockEntity>
 }
 
 @Dao
@@ -162,4 +182,79 @@ interface OutboxDao {
 
   @Query("DELETE FROM outbox WHERE entityType = :entityType AND localId = :localId")
   suspend fun deleteForEntity(entityType: OutboxEntityType, localId: String)
+}
+
+@Dao
+interface ReminderDao {
+  @Query("SELECT * FROM reminders ORDER BY reminderTimeMillis ASC")
+  fun observeReminders(): Flow<List<com.ctonew.taskmanagement.core.database.model.ReminderEntity>>
+
+  @Query("SELECT * FROM reminders WHERE localId = :localId")
+  suspend fun getByLocalId(localId: String): com.ctonew.taskmanagement.core.database.model.ReminderEntity?
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsert(entity: com.ctonew.taskmanagement.core.database.model.ReminderEntity)
+
+  @Query("DELETE FROM reminders WHERE localId = :localId")
+  suspend fun deleteByLocalId(localId: String)
+
+  @Query(
+    """
+    SELECT * FROM reminders
+    WHERE reminderTimeMillis <= :currentTimeMillis
+      AND reminderTimeMillis IS NOT NULL
+    ORDER BY reminderTimeMillis ASC
+    """,
+  )
+  suspend fun getDueReminders(currentTimeMillis: Long): List<com.ctonew.taskmanagement.core.database.model.ReminderEntity>
+}
+
+@Dao
+interface FocusSessionDao {
+  @Query("SELECT * FROM focus_sessions ORDER BY startedAtMillis DESC")
+  fun observeFocusSessions(): Flow<List<com.ctonew.taskmanagement.core.database.model.FocusSessionEntity>>
+
+  @Query("SELECT * FROM focus_sessions WHERE localId = :localId")
+  suspend fun getByLocalId(localId: String): com.ctonew.taskmanagement.core.database.model.FocusSessionEntity?
+
+  @Query(
+    """
+    SELECT * FROM focus_sessions
+    WHERE startedAtMillis >= :startOfDayMillis
+      AND startedAtMillis < :endOfDayMillis
+    ORDER BY startedAtMillis DESC
+    """,
+  )
+  suspend fun getFocusSessionsForDate(startOfDayMillis: Long, endOfDayMillis: Long): List<com.ctonew.taskmanagement.core.database.model.FocusSessionEntity>
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsert(entity: com.ctonew.taskmanagement.core.database.model.FocusSessionEntity)
+
+  @Query("DELETE FROM focus_sessions WHERE localId = :localId")
+  suspend fun deleteByLocalId(localId: String)
+}
+
+@Dao
+interface ProductivityLogDao {
+  @Query("SELECT * FROM productivity_logs ORDER BY modifiedAtMillis DESC")
+  fun observeProductivityLogs(): Flow<List<com.ctonew.taskmanagement.core.database.model.ProductivityLogEntity>>
+
+  @Query("SELECT * FROM productivity_logs WHERE localId = :localId")
+  suspend fun getByLocalId(localId: String): com.ctonew.taskmanagement.core.database.model.ProductivityLogEntity?
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsert(entity: com.ctonew.taskmanagement.core.database.model.ProductivityLogEntity)
+
+  @Query("DELETE FROM productivity_logs WHERE localId = :localId")
+  suspend fun deleteByLocalId(localId: String)
+
+  @Query(
+    """
+    SELECT * FROM productivity_logs
+    WHERE modifiedAtMillis >= :startOfDayMillis
+      AND modifiedAtMillis < :endOfDayMillis
+    ORDER BY modifiedAtMillis DESC
+    """,
+  )
+  suspend fun getProductivityLogsForDate(startOfDayMillis: Long, endOfDayMillis: Long): List<com.ctonew.taskmanagement.core.database.model.ProductivityLogEntity>
 }

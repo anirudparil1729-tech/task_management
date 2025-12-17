@@ -124,11 +124,16 @@ fun TaskManagementApp() {
       }
 
       composable(TopLevelDestination.Calendar.route) {
-        PlaceholderScreen(titleResId = R.string.calendar)
+        com.ctonew.taskmanagement.ui.features.PlannerScreen(
+          onNavigateToTask = { taskLocalId ->
+            // Navigate to task detail
+            navController.navigate("task_detail/$taskLocalId")
+          }
+        )
       }
 
       composable(TopLevelDestination.Productivity.route) {
-        PlaceholderScreen(titleResId = R.string.productivity)
+        com.ctonew.taskmanagement.ui.features.ProductivityScreen()
       }
 
       composable(TopLevelDestination.Settings.route) {

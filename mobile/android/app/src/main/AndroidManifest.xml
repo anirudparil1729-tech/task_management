@@ -41,7 +41,7 @@
     </service>
 
     <service
-      android:name=".notifications.FocusTimerService"
+      android:name=".ui.features.FocusTimerService"
       android:enabled="true"
       android:exported="false"
       android:foregroundServiceType="specialUse" />

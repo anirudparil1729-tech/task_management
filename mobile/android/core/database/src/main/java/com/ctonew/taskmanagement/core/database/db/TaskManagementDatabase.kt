@@ -4,7 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ctonew.taskmanagement.core.database.dao.CategoryDao
+import com.ctonew.taskmanagement.core.database.dao.FocusSessionDao
 import com.ctonew.taskmanagement.core.database.dao.OutboxDao
+import com.ctonew.taskmanagement.core.database.dao.ProductivityLogDao
+import com.ctonew.taskmanagement.core.database.dao.ReminderDao
 import com.ctonew.taskmanagement.core.database.dao.TaskDao
 import com.ctonew.taskmanagement.core.database.dao.TimeBlockDao
 import com.ctonew.taskmanagement.core.database.model.CategoryEntity
@@ -36,4 +39,7 @@ abstract class TaskManagementDatabase : RoomDatabase() {
   abstract fun categoryDao(): CategoryDao
   abstract fun timeBlockDao(): TimeBlockDao
   abstract fun outboxDao(): OutboxDao
+  abstract fun reminderDao(): ReminderDao
+  abstract fun focusSessionDao(): FocusSessionDao
+  abstract fun productivityLogDao(): ProductivityLogDao
 }

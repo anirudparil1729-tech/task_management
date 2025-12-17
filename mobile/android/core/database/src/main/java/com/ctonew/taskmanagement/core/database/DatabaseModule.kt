@@ -4,15 +4,20 @@ import android.content.Context
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.ctonew.taskmanagement.core.database.dao.CategoryDao
+import com.ctonew.taskmanagement.core.database.dao.FocusSessionDao
 import com.ctonew.taskmanagement.core.database.dao.OutboxDao
+import com.ctonew.taskmanagement.core.database.dao.ProductivityLogDao
+import com.ctonew.taskmanagement.core.database.dao.ReminderDao
 import com.ctonew.taskmanagement.core.database.dao.TaskDao
 import com.ctonew.taskmanagement.core.database.dao.TimeBlockDao
 import com.ctonew.taskmanagement.core.database.db.TaskManagementDatabase
 import com.ctonew.taskmanagement.core.database.repository.CategoriesRepository
 import com.ctonew.taskmanagement.core.database.repository.DefaultCategoriesRepository
 import com.ctonew.taskmanagement.core.database.repository.DefaultPlannerRepository
+import com.ctonew.taskmanagement.core.database.repository.DefaultProductivityRepository
 import com.ctonew.taskmanagement.core.database.repository.DefaultTasksRepository
 import com.ctonew.taskmanagement.core.database.repository.PlannerRepository
+import com.ctonew.taskmanagement.core.database.repository.ProductivityRepository
 import com.ctonew.taskmanagement.core.database.repository.TasksRepository
 import com.ctonew.taskmanagement.core.database.sync.SyncEngine
 import dagger.Binds
@@ -49,6 +54,15 @@ object DatabaseModule {
   fun provideOutboxDao(db: TaskManagementDatabase): OutboxDao = db.outboxDao()
 
   @Provides
+  fun provideReminderDao(db: TaskManagementDatabase): ReminderDao = db.reminderDao()
+
+  @Provides
+  fun provideFocusSessionDao(db: TaskManagementDatabase): FocusSessionDao = db.focusSessionDao()
+
+  @Provides
+  fun provideProductivityLogDao(db: TaskManagementDatabase): ProductivityLogDao = db.productivityLogDao()
+
+  @Provides
   @Singleton
   fun provideWorkManager(
     @ApplicationContext context: Context,
@@ -72,4 +86,7 @@ abstract class RepositoriesModule {
 
   @Binds
   abstract fun bindPlannerRepository(impl: DefaultPlannerRepository): PlannerRepository
+
+  @Binds
+  abstract fun bindProductivityRepository(impl: DefaultProductivityRepository): ProductivityRepository
 }
