@@ -74,3 +74,24 @@ docker-compose.override.yml
 *.db
 *.sqlite
 *.sqlite3
+
+# Android
+.gradle/
+.idea/
+*.iml
+*.apk
+*.ap_
+*.dex
+local.properties
+bin/
+gen/
+out/
+build/
+.DS_Store
+gradle/wrapper/gradle-wrapper.jar
+.classpath
+.project
+.settings/
+*.jks
+*.keystore
+lint.xml
